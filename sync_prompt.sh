@@ -6,14 +6,10 @@ auto_sync(){
     if [ -f "$SYNC_FILE" ]; then
         # Read the stored date from the file
         read -r stored_date stored_answer < "$SYNC_FILE"
-        echo "$stored_date" 
-        echo "$stored_answer"
         # Get today's date in YYYY-MM-DD format
         today_date=$(date +"%Y-%m-%d")
-        echo "$today_date"
         # If the stored date is today's date, skip the prompt
         if [ "$stored_date" = "$today_date" ]; then
-            echo "Sync already processed today. No prompt needed."
             return
         fi
     fi
