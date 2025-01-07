@@ -12,3 +12,9 @@ chmod +x script.sh
 ```
 ./script.sh /path/to/other/directory
 ```
+
+### if you want to run specific script when ever you are opening terminal add in your zshrc or bash_profile e.g
+```
+# running .sh files 
+source /path/script.sh
+```
