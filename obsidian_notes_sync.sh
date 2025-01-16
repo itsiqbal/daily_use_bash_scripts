@@ -23,10 +23,6 @@ notes_stash_and_sync() {
         return 1
     fi
 
-    #drop all the previous stashes to avoid issues
-    echo "Cleaning all the local stashes..." | tee -a "$LOG_FILE"
-    git stash clear
-
     # Stash changes if any, and pull with rebase
     if ! git diff-index --quiet HEAD --; then
         echo "Stashing local changes..." | tee -a "$LOG_FILE"
@@ -46,15 +42,21 @@ notes_stash_and_sync() {
     fi
 
     # Check for uncommitted changes before committing
-    if ! git diff-index --quiet HEAD --; then
-        # Add all changes
-        git add .
+    if ! git diff-index --quiet HEAD -- || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+        # Add all changes, including untracked files
+        echo "Adding changes to staging, including untracked files..." | tee -a "$LOG_FILE"
+        git add --all
+
+        # Debugging: Confirm staged changes
+        echo "Staged changes:" | tee -a "$LOG_FILE"
+        git status | tee -a "$LOG_FILE"
 
         # Get the current date in YYYY-MM-DD format
         local current_date
         current_date=$(date +"%Y-%m-%d")
 
         # Commit with message including current date
+        echo "Committing changes..." | tee -a "$LOG_FILE"
         git commit -m "obsidian sync - $current_date"
 
         # Push changes, retry on network failure
@@ -66,6 +68,10 @@ notes_stash_and_sync() {
     else
         echo "No changes to commit." | tee -a "$LOG_FILE"
     fi
+
+    # Drop all the previous stashes to avoid issues
+    echo "Cleaning all the local stashes..." | tee -a "$LOG_FILE"
+    git stash clear
 
     echo "Sync completed for $start_dir at $(date)" | tee -a "$LOG_FILE"
 }
