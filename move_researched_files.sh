@@ -3,8 +3,8 @@
 set -o pipefail
 
 LOG_FILE="./move_researched_files.log"
-CONFIG_FILE="${HOME}/.move-notes.conf"
-METADATA_FILE=".move-notes-metadata.json"
+CONFIG_FILE="${HOME}/.move-researched-files.conf"
+METADATA_FILE=".move-researched-files-metadata.json"
 
 # Default config values
 PRESERVE_STRUCTURE="true"
@@ -167,20 +167,25 @@ function safe_move_or_copy() {
     mkdir -p -- "${target_dir}"
   fi
   
-  # Handle duplicate filenames
+  # Handle duplicate filenames - create one backup and replace
   if [[ -e "${target}" ]]; then
-    local ts base ext new_target
-    ts="$(date +%s)"
+    local base ext backup_file
     base="$(basename "${target%.*}")"
     ext="${target##*.}"
     
-    if [[ "${base}" == "${target}" ]]; then
+    if [[ "${base}" == "$(basename "${target}")" ]]; then
       # No extension
-      new_target="${target}.${ts}"
+      backup_file=".${target}.backup"
     else
-      new_target="${target_dir}/${base}.${ts}.${ext}"
+      backup_file="${target_dir}/.${base}.backup.${ext}"
     fi
-    target="${new_target}"
+    
+    # Create backup only if it doesn't exist
+    if [[ ! -e "${backup_file}" && "${dry_run}" != "1" ]]; then
+      cp -- "${target}" "${backup_file}"
+      log_message "Created backup: '${backup_file}'"
+      log_history "Created backup: '${backup_file}'"
+    fi
   fi
   
   if [[ "${dry_run}" == "1" ]]; then
@@ -227,6 +232,7 @@ function restore_exact() {
     -not -path "*/__pycache__/*" \
     -not -path "*/.git/*" \
     -not -path "*/dist/*" \
+    -not -name "README.md"\
     -not -path "*/build/*")
   
   for f in "${files[@]}"; do
@@ -317,7 +323,7 @@ action="${1}"
 from_dir="${2}"
 to_dir="${3}"
 
-log_title "Move Notes Utility"
+log_title "Move Researched + .md files Utility"
 log_header "Configuration"
 log_message "$(
   cat <<EOF
@@ -360,6 +366,7 @@ else
     -not -path "*/__pycache__/*" \
     -not -path "*/.git/*" \
     -not -path "*/dist/*" \
+    -not -name "README.md"\
     -not -path "*/build/*")
   
   if [[ ${#files[@]} -eq 0 ]]; then
@@ -387,3 +394,8 @@ fi
 log_header "Done"
 log_message "Operation '${action}' completed successfully."
 log_history "Completed '${action}' (${operation_mode}) from '${from_dir}' to '${to_dir}'"
+
+
+#example commands to execute
+#copy_files ./move_researched_files.sh --copy store /$HOME/Desktop/projects/airasia/oms /$HOME/Desktop/projects/iqbal/dotfiles/markdowns/oms 
+#copy_back_files ./move_researched_files.sh --copy store /$HOME/Desktop/projects/iqbal/dotfiles/markdowns/oms /$HOME/Desktop/projects/airasia/oms
