@@ -78,7 +78,7 @@ notes_stash_and_sync() {
 
 
 # Set the starting directory
-start_dir="${1:-$HOME/Desktop/projects/iqbal/iqbal-notes/}"
+start_dir="${1:-$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/iqbal-notes/}"
 
 # Verify if the starting directory exists
 if [ -d "$start_dir" ]; then
