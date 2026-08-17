@@ -19,6 +19,13 @@ TARGET_APPS=(
   "Spotify"
   "Postman"
   "Discord"
+  "Bruno",
+  "Electron",
+  "Preview",
+  "Sourcetree",
+  "datagrip",
+  "idea"
+  "Terminal"
 )
 
 #############################################

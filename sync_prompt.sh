@@ -21,7 +21,12 @@ auto_sync(){
     # If the user chooses 'y' or 'Y', run the sync commands
     if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
         echo "Syncing data..."
-        ~/Desktop/projects/iqbal/bash_scripts/obsidian_notes_sync.sh    # Make sure this script is executable
+
+        if [[ "$USER" == "muhammadiqbal" ]]; then
+            ~/Desktop/projects/iqbal/bash/daily_use_bash_scripts/obsidian_notes_sync.sh
+        else
+            ~/Desktop/projects/iqbal/bash_scripts/obsidian_notes_sync.sh
+        fi
         
     elif [[ "$answer" == "n" || "$answer" == "N" ]]; then
         echo "Sync skipped for today."
